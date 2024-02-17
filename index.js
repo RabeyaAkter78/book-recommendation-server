@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -26,7 +26,7 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
         const bookCollection = client.db('booksDb').collection('books')
-
+        // Search 
         app.get('/books', async (req, res) => {
             // const search = req.query.search;
 
@@ -41,11 +41,18 @@ async function run() {
                     { genre: { $regex: regex } },
                 ],
             }).toArray();
-            
+
             res.send(result);
             // console.log(result);
         });
 
+        // For Book Detail 
+         app.get('/details/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await bookCollection.findOne(query);
+            res.send(result)
+        })
 
 
 
